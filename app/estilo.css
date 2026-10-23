@@ -1,20 +1,29 @@
 :root {
-  --fundo: #fbf8f1;
-  --cartao: #ffffff;
-  --verde: #3f8f63;
-  --verde-escuro: #2d6d4a;
-  --verde-claro: #e4f1e9;
-  --texto: #25302a;
-  --suave: #6b7a70;
-  --borda: #e6e0d2;
-  --erro: #b3402f;
+  --roxo: #6b46e5;
+  --azul: #2f7bf5;
+  --degrade: linear-gradient(135deg, #8b5cf6 0%, #6b46e5 45%, #2f7bf5 100%);
+  --fundo-a: #f5f3ff;
+  --fundo-b: #e8f1ff;
+  --cartao: rgba(255, 255, 255, 0.78);
+  --texto: #1f1b3a;
+  --suave: #6b6890;
+  --borda: rgba(107, 70, 229, 0.16);
+  --claro: #ece8ff;
+  --erro: #c0392b;
+  --sombra: 0 8px 24px rgba(75, 55, 170, 0.1);
 }
 
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: var(--fundo);
+  min-height: 100vh;
+  background: var(--fundo-a);
+  background-image:
+    radial-gradient(circle at 12% -10%, rgba(139, 92, 246, 0.22), transparent 45%),
+    radial-gradient(circle at 100% 5%, rgba(47, 123, 245, 0.2), transparent 40%),
+    linear-gradient(180deg, var(--fundo-a), var(--fundo-b));
+  background-attachment: fixed;
   color: var(--texto);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 16px;
@@ -29,9 +38,37 @@ main {
 
 [hidden] { display: none !important; }
 
-h1 { margin: 0; font-size: 1.6rem; color: var(--verde-escuro); }
+h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  background: var(--degrade);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 h2 { margin: 0 0 12px; font-size: 1.05rem; }
 .sub { color: var(--suave); margin: 4px 0 16px; }
+
+.marca { display: flex; align-items: center; gap: 12px; }
+.nota {
+  width: 64px;
+  height: 40px;
+  flex: none;
+  filter: drop-shadow(0 6px 8px rgba(75, 55, 170, 0.3));
+  animation: flutuar 3.2s ease-in-out infinite;
+}
+.nota .brilho { animation: brilhar 3.2s ease-in-out infinite; }
+
+@keyframes flutuar {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-5px) rotate(3deg); }
+}
+@keyframes brilhar {
+  0%, 35% { transform: translateX(0); }
+  75%, 100% { transform: translateX(105px); }
+}
+
+#tela-entrada .marca { margin-bottom: 4px; }
 
 .topo {
   display: flex;
@@ -42,8 +79,11 @@ h2 { margin: 0 0 12px; font-size: 1.05rem; }
 
 .cartao {
   background: var(--cartao);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border: 1px solid var(--borda);
-  border-radius: 14px;
+  border-radius: 18px;
+  box-shadow: var(--sombra);
   padding: 16px;
   margin-bottom: 12px;
 }
@@ -51,12 +91,14 @@ h2 { margin: 0 0 12px; font-size: 1.05rem; }
 .destaque {
   display: flex;
   gap: 12px;
-  background: var(--verde-claro);
+  background: var(--degrade);
   border-color: transparent;
+  color: #fff;
 }
 .numero-bloco { flex: 1; display: flex; flex-direction: column; }
+.destaque .rotulo { color: rgba(255, 255, 255, 0.82); }
 .rotulo { font-size: 0.85rem; color: var(--suave); }
-.numero-bloco strong { font-size: 1.5rem; color: var(--verde-escuro); }
+.numero-bloco strong { font-size: 1.5rem; color: #fff; }
 
 label { display: block; font-size: 0.9rem; color: var(--suave); margin-bottom: 10px; flex: 1; }
 
@@ -66,12 +108,12 @@ input, select {
   padding: 12px;
   font-size: 1rem;
   color: var(--texto);
-  background: #fff;
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid var(--borda);
-  border-radius: 10px;
+  border-radius: 12px;
 }
 input:focus, select:focus, button:focus-visible {
-  outline: 2px solid var(--verde);
+  outline: 2px solid var(--roxo);
   outline-offset: 1px;
 }
 
@@ -80,15 +122,24 @@ button {
   font-size: 1rem;
   font-weight: 600;
   color: #fff;
-  background: var(--verde);
+  background: var(--degrade);
   border: 0;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   min-height: 44px;
+  box-shadow: 0 4px 12px rgba(107, 70, 229, 0.28);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
-button:hover { background: var(--verde-escuro); }
-button.secundario { background: transparent; color: var(--verde-escuro); border: 1px solid var(--verde); }
-button.secundario:hover { background: var(--verde-claro); }
+button:hover { filter: brightness(1.08); box-shadow: 0 6px 16px rgba(107, 70, 229, 0.36); }
+button:active { transform: scale(0.98); }
+button:disabled { opacity: 0.6; cursor: default; }
+button.secundario {
+  background: transparent;
+  color: var(--roxo);
+  border: 1px solid var(--roxo);
+  box-shadow: none;
+}
+button.secundario:hover { background: var(--claro); filter: none; }
 button.pequeno { padding: 6px 14px; min-height: 36px; }
 #form-gasto > button, #btn-foto { width: 100%; }
 #btn-foto { margin-top: 10px; }
@@ -98,12 +149,12 @@ button.pequeno { padding: 6px 14px; min-height: 36px; }
 
 .msg { margin: 10px 0 0; min-height: 1.2em; font-size: 0.9rem; color: var(--suave); }
 .msg.erro { color: var(--erro); }
-.msg.ok { color: var(--verde-escuro); }
+.msg.ok { color: var(--roxo); }
 
 .barra-item { margin-bottom: 10px; }
 .barra-info { display: flex; justify-content: space-between; font-size: 0.9rem; }
-.barra-fundo { height: 10px; background: var(--verde-claro); border-radius: 6px; margin-top: 4px; overflow: hidden; }
-.barra-cheia { height: 100%; background: var(--verde); border-radius: 6px; }
+.barra-fundo { height: 10px; background: var(--claro); border-radius: 6px; margin-top: 4px; overflow: hidden; }
+.barra-cheia { height: 100%; background: var(--degrade); border-radius: 6px; transition: width 0.5s ease; }
 
 .lista { list-style: none; margin: 0; padding: 0; }
 .lista li {
@@ -118,6 +169,19 @@ button.pequeno { padding: 6px 14px; min-height: 36px; }
 .gasto-desc { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gasto-meta { font-size: 0.8rem; color: var(--suave); }
 .gasto-valor { font-weight: 600; }
-.lista button { padding: 4px 10px; min-height: 36px; font-size: 0.85rem; background: transparent; color: var(--erro); border: 1px solid var(--borda); }
-.lista button:hover { background: #fbeae7; }
+.lista button {
+  padding: 4px 10px;
+  min-height: 36px;
+  font-size: 0.85rem;
+  background: transparent;
+  color: var(--erro);
+  border: 1px solid var(--borda);
+  box-shadow: none;
+}
+.lista button:hover { background: #fdecea; filter: none; }
 .vazio { color: var(--suave); font-size: 0.9rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nota, .nota .brilho { animation: none; }
+  .barra-cheia, button { transition: none; }
+}

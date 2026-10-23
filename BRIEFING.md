@@ -5,7 +5,7 @@
 - **App:** Meu Bolso, app de gastos pessoais.
 - **Quem usa:** só eu, no celular e no computador.
 - **Onde lanço mais:** na mesa de casa, sentado, com calma.
-- **Sensação ao abrir:** claro e leve, fundo branco ou creme, verde suave, calma e controle.
+- **Sensação ao abrir:** claro, leve e moderno, fundo lavanda e azul-claro, destaques em degradê roxo e azul, com uma cédula animada no topo (tema atualizado em outubro de 2026; antes era verde suave).
 
 ## L — Limites
 
