@@ -211,8 +211,88 @@
     if (linha) $("texto-resumo").textContent = linha.texto;
   }
 
-  function assistente() {
-    mostrar($("msg-assistente"), "O assistente chega na sexta.");
+  // Reduz a foto para no máximo 1600 px, em JPEG. A foto nunca é guardada.
+  function reduzirFoto(arquivo) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(arquivo);
+      var img = new Image();
+      img.onload = function () {
+        var escala = Math.min(1, 1600 / Math.max(img.width, img.height));
+        var c = document.createElement("canvas");
+        c.width = Math.round(img.width * escala);
+        c.height = Math.round(img.height * escala);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        resolve(c.toDataURL("image/jpeg", 0.85).split(",")[1]);
+      };
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        reject(new Error("foto"));
+      };
+      img.src = url;
+    });
+  }
+
+  async function falarComAssistente(mensagem, imagem) {
+    var msg = $("msg-assistente");
+    $("btn-enviar").disabled = true;
+    $("btn-foto").disabled = true;
+    mostrar(msg, "Pensando…");
+    try {
+      var s = await banco.auth.getSession();
+      if (!s.data || !s.data.session) {
+        return mostrar(msg, "Seu login venceu. Saia do app e entre de novo.", "erro");
+      }
+      var r = await fetch("/api/assistente", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + s.data.session.access_token
+        },
+        body: JSON.stringify({
+          mensagem: mensagem,
+          imagem: imagem || "",
+          mime: imagem ? "image/jpeg" : "",
+          categorias: cfg.CATEGORIAS
+        })
+      });
+      var j = null;
+      try { j = await r.json(); } catch (e) { /* sem corpo */ }
+      if (!r.ok) {
+        return mostrar(msg, (j && j.resposta) || "O assistente não respondeu. Tente de novo em instantes.", "erro");
+      }
+      mostrar(msg, j.resposta, j.mudou ? "ok" : "");
+      if (j.mudou) {
+        $("assistente-texto").value = "";
+        carregar();
+      }
+    } catch (e) {
+      mostrar(msg, "Sem conexão. Verifique a internet e tente de novo.", "erro");
+    } finally {
+      $("btn-enviar").disabled = false;
+      $("btn-foto").disabled = false;
+    }
+  }
+
+  function enviarTexto() {
+    var texto = $("assistente-texto").value.trim();
+    if (!texto) return mostrar($("msg-assistente"), "Escreva o gasto ou faça uma pergunta.", "erro");
+    falarComAssistente(texto, "");
+  }
+
+  async function enviarFoto(e) {
+    var arquivo = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!arquivo) return;
+    var msg = $("msg-assistente");
+    mostrar(msg, "Preparando a foto…");
+    var imagem;
+    try {
+      imagem = await reduzirFoto(arquivo);
+    } catch (err) {
+      return mostrar(msg, "Não deu para abrir a foto. Tente com outra imagem.", "erro");
+    }
+    falarComAssistente($("assistente-texto").value.trim(), imagem);
   }
 
   // ---------- Início ----------
@@ -228,8 +308,12 @@
     $("btn-criar").addEventListener("click", criarConta);
     $("btn-sair").addEventListener("click", sair);
     $("form-gasto").addEventListener("submit", lancar);
-    $("btn-enviar").addEventListener("click", assistente);
-    $("btn-foto").addEventListener("click", assistente);
+    var arquivoFoto = document.createElement("input");
+    arquivoFoto.type = "file";
+    arquivoFoto.accept = "image/*";
+    arquivoFoto.addEventListener("change", enviarFoto);
+    $("btn-enviar").addEventListener("click", enviarTexto);
+    $("btn-foto").addEventListener("click", function () { arquivoFoto.click(); });
 
     if (!window.supabase) {
       $("tela-entrada").hidden = false;
