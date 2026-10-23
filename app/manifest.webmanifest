@@ -1,0 +1,13 @@
+{
+  "name": "Meu Bolso",
+  "short_name": "Meu Bolso",
+  "description": "Gastos pessoais, simples e no seu bolso.",
+  "lang": "pt-BR",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fbf8f1",
+  "theme_color": "#3f8f63",
+  "icons": [
+    { "src": "icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

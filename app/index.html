@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#3f8f63">
+  <title>Meu Bolso</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icone.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+  <main>
+    <!-- Tela de entrada -->
+    <section id="tela-entrada" hidden>
+      <h1>Meu Bolso</h1>
+      <p class="sub">Entre para ver seus gastos.</p>
+      <form id="form-entrada" class="cartao">
+        <label>E-mail
+          <input id="email" type="email" autocomplete="email" required>
+        </label>
+        <label>Senha
+          <input id="senha" type="password" autocomplete="current-password" minlength="6" required>
+        </label>
+        <div class="linha">
+          <button type="submit" id="btn-entrar">Entrar</button>
+          <button type="button" id="btn-criar" class="secundario">Criar conta</button>
+        </div>
+        <p id="msg-entrada" class="msg" role="alert"></p>
+      </form>
+    </section>
+
+    <!-- Tela principal -->
+    <section id="tela-app" hidden>
+      <header class="topo">
+        <h1>Meu Bolso</h1>
+        <button type="button" id="btn-sair" class="secundario pequeno">Sair</button>
+      </header>
+
+      <div class="cartao destaque">
+        <div class="numero-bloco">
+          <span class="rotulo">Hoje</span>
+          <strong id="total-hoje">R$ 0,00</strong>
+        </div>
+        <div class="numero-bloco">
+          <span class="rotulo" id="rotulo-mes">No mês</span>
+          <strong id="total-mes">R$ 0,00</strong>
+        </div>
+      </div>
+
+      <div class="cartao" id="cartao-resumo" hidden>
+        <h2>Resumo da semana</h2>
+        <p id="texto-resumo"></p>
+      </div>
+
+      <form id="form-gasto" class="cartao">
+        <h2>Lançar à mão</h2>
+        <label>Valor (R$)
+          <input id="valor" type="text" inputmode="decimal" placeholder="0,00" required>
+        </label>
+        <label>Onde ou com o quê
+          <input id="descricao" type="text" maxlength="80" placeholder="Ex.: padaria">
+        </label>
+        <div class="linha">
+          <label>Categoria
+            <select id="categoria"></select>
+          </label>
+          <label>Data
+            <input id="data" type="date" required>
+          </label>
+        </div>
+        <button type="submit">Salvar gasto</button>
+        <p id="msg-gasto" class="msg" role="alert"></p>
+      </form>
+
+      <div class="cartao">
+        <h2>Por categoria</h2>
+        <div id="barras"></div>
+      </div>
+
+      <div class="cartao">
+        <h2>Gastos do mês</h2>
+        <ul id="lista" class="lista"></ul>
+        <p id="msg-lista" class="msg" role="alert"></p>
+      </div>
+
+      <div class="cartao">
+        <h2>Assistente</h2>
+        <div class="linha">
+          <input id="assistente-texto" type="text" placeholder="Ex.: gastei 30 no almoço">
+          <button type="button" id="btn-enviar">Enviar</button>
+        </div>
+        <button type="button" id="btn-foto" class="secundario">Foto do cupom</button>
+        <p id="msg-assistente" class="msg"></p>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="configuracao.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
