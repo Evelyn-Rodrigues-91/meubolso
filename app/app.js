@@ -116,6 +116,7 @@
     });
     $("total-mes").textContent = brl.format(mes);
     $("total-hoje").textContent = brl.format(dia);
+    $("media-dia").textContent = "Média de " + brl.format(mes / new Date().getDate()) + " por dia";
     $("rotulo-mes").textContent = "No mês de " + new Date().toLocaleDateString("pt-BR", { month: "long" });
 
     var barras = $("barras");
