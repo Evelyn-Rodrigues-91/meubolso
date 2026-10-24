@@ -305,6 +305,59 @@
     falarComAssistente(texto, "");
   }
 
+  // Microfone: o navegador reconhece a fala em português e o texto vai para o assistente.
+  function prepararMicrofone() {
+    var Reconhecimento = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var botao = $("btn-mic");
+    if (!Reconhecimento) {
+      botao.hidden = true;
+      $("dica-voz").hidden = false;
+      return;
+    }
+    var rec = null;
+    var ouvindo = false;
+    botao.addEventListener("click", function () {
+      var msg = $("msg-assistente");
+      if (ouvindo && rec) return rec.stop();
+      if ($("btn-enviar").disabled) return;
+      var ouviu = "";
+      var erro = "";
+      rec = new Reconhecimento();
+      rec.lang = "pt-BR";
+      rec.interimResults = false;
+      rec.continuous = false;
+      rec.maxAlternatives = 1;
+      rec.onstart = function () {
+        ouvindo = true;
+        botao.classList.add("ouvindo");
+        mostrar(msg, "Ouvindo… fale o gasto.");
+      };
+      rec.onresult = function (ev) {
+        ouviu = (ev.results[0][0].transcript || "").trim();
+      };
+      rec.onerror = function (ev) { erro = ev.error || "erro"; };
+      rec.onend = function () {
+        ouvindo = false;
+        botao.classList.remove("ouvindo");
+        if (erro === "aborted") return mostrar(msg, "");
+        if (erro === "not-allowed" || erro === "service-not-allowed") {
+          return mostrar(msg, "Libere o microfone no navegador e tente de novo.", "erro");
+        }
+        if (erro === "audio-capture") return mostrar(msg, "Não achei um microfone neste aparelho.", "erro");
+        if (erro === "network") return mostrar(msg, "Sem conexão. Verifique a internet e tente de novo.", "erro");
+        if (erro && erro !== "no-speech") return mostrar(msg, "Não deu para ouvir. Tente de novo ou escreva o gasto.", "erro");
+        if (!ouviu) return mostrar(msg, "Não ouvi nada. Toque no microfone e fale de novo.", "erro");
+        $("assistente-texto").value = ouviu;
+        falarComAssistente(ouviu, "");
+      };
+      try {
+        rec.start();
+      } catch (e) {
+        mostrar(msg, "Não deu para ligar o microfone. Tente de novo.", "erro");
+      }
+    });
+  }
+
   async function enviarFoto(e) {
     var arquivo = e.target.files && e.target.files[0];
     e.target.value = "";
@@ -342,6 +395,7 @@
       arquivoFoto.accept = "image/*";
       arquivoFoto.addEventListener("change", protegido(enviarFoto, "msg-assistente"));
       $("btn-enviar").addEventListener("click", enviarTexto);
+      prepararMicrofone();
       $("btn-foto").addEventListener("click", function () { arquivoFoto.click(); });
 
       if (!window.supabase) {

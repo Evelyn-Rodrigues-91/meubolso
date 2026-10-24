@@ -124,8 +124,15 @@
         <h2>Assistente</h2>
         <div class="linha">
           <input id="assistente-texto" type="text" placeholder="Ex.: gastei 30 no almoço">
+          <button type="button" id="btn-mic" class="microfone" aria-label="Falar com o assistente" title="Falar com o assistente">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="3" width="6" height="11" rx="3"/>
+              <path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>
+            </svg>
+          </button>
           <button type="button" id="btn-enviar">Enviar</button>
         </div>
+        <p id="dica-voz" class="msg" hidden>Use o microfone do teclado do celular.</p>
         <button type="button" id="btn-foto" class="secundario">Foto do cupom</button>
         <p id="msg-assistente" class="msg"></p>
       </div>

@@ -167,6 +167,20 @@ label.chip {
 
 .linha { display: flex; gap: 10px; align-items: flex-end; }
 .linha > button { flex: 1; }
+.linha > button.microfone {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.microfone.ouvindo { animation: pulsar 1s ease-in-out infinite; }
+@keyframes pulsar {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(107, 70, 229, 0.5); }
+  50% { box-shadow: 0 0 0 10px rgba(107, 70, 229, 0); }
+}
 
 .msg { margin: 10px 0 0; min-height: 1.2em; font-size: 0.9rem; color: var(--suave); }
 .msg.erro { color: var(--erro); }
@@ -204,6 +218,6 @@ label.chip {
 .vazio { color: var(--suave); font-size: 0.9rem; }
 
 @media (prefers-reduced-motion: reduce) {
-  .nota, .nota .brilho { animation: none; }
+  .nota, .nota .brilho, .microfone.ouvindo { animation: none; }
   .barra-cheia, button { transition: none; }
 }
