@@ -92,20 +92,19 @@
 
       <form id="form-gasto" class="cartao">
         <h2>Lançar à mão</h2>
+        <fieldset class="categorias">
+          <legend>Categoria</legend>
+          <div id="categoria" class="chips"></div>
+        </fieldset>
         <label>Valor (R$)
           <input id="valor" type="text" inputmode="decimal" placeholder="0,00" required>
         </label>
         <label>Onde ou com o quê
           <input id="descricao" type="text" maxlength="80" placeholder="Ex.: padaria">
         </label>
-        <div class="linha">
-          <label>Categoria
-            <select id="categoria"></select>
-          </label>
-          <label>Data
-            <input id="data" type="date" required>
-          </label>
-        </div>
+        <label>Data
+          <input id="data" type="date" required>
+        </label>
         <button type="submit">Salvar gasto</button>
         <p id="msg-gasto" class="msg" role="alert"></p>
       </form>

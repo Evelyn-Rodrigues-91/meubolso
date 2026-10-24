@@ -23,6 +23,7 @@
     if (t.indexOf("already registered") >= 0 || t.indexOf("already been registered") >= 0) return "Este e-mail já tem conta. Toque em Entrar.";
     if (t.indexOf("password") >= 0 && t.indexOf("least") >= 0) return "A senha precisa ter pelo menos 6 caracteres.";
     if (t.indexOf("valid email") >= 0 || t.indexOf("invalid email") >= 0) return "Esse e-mail não parece certo. Confira e tente de novo.";
+    if (t.indexOf("jwt") >= 0 || t.indexOf("refresh token") >= 0 || t.indexOf("not authenticated") >= 0) return "Seu login venceu. Toque em Sair e entre de novo.";
     if (t.indexOf("rate limit") >= 0) return "Muitas tentativas. Espere um minuto e tente de novo.";
     if (t.indexOf("fetch") >= 0 || t.indexOf("network") >= 0) return "Sem conexão. Verifique a internet e tente de novo.";
     return "Algo deu errado. Tente de novo em instantes.";
@@ -194,7 +195,11 @@
   async function lancar(e) {
     e.preventDefault();
     var msg = $("msg-gasto");
-    var bruto = $("valor").value.trim().replace(/\./g, "").replace(",", ".");
+    var marcada = document.querySelector("input[name=categoria]:checked");
+    if (!marcada) return mostrar(msg, "Escolha a categoria do gasto.", "erro");
+    // Aceita 25,90, 25.90 e 1.234,56 (ponto sozinho com 1 ou 2 casas é decimal).
+    var texto = $("valor").value.trim();
+    var bruto = /^\d+\.\d{1,2}$/.test(texto) ? texto : texto.replace(/\./g, "").replace(",", ".");
     var valor = Number(bruto);
     if (!bruto || !isFinite(valor) || valor <= 0) {
       return mostrar(msg, "Digite um valor maior que zero, por exemplo 25,90.", "erro");
@@ -208,10 +213,11 @@
       data: data,
       descricao: $("descricao").value.trim(),
       valor: Math.round(valor * 100) / 100,
-      categoria: $("categoria").value,
+      categoria: marcada.value,
       origem: "manual"
     });
     if (r.error) return mostrar(msg, "Não deu para salvar. " + frase(r.error), "erro");
+    marcada.checked = false;
     $("valor").value = "";
     $("descricao").value = "";
     mostrar(msg, "Gasto salvo.", "ok");
@@ -317,11 +323,14 @@
   // ---------- Início ----------
   async function iniciar() {
     try {
-      var sel = $("categoria");
-      cfg.CATEGORIAS.forEach(function (c) {
-        var o = document.createElement("option");
-        o.value = c; o.textContent = c;
-        sel.append(o);
+      var grupo = $("categoria");
+      cfg.CATEGORIAS.forEach(function (c, i) {
+        var r = document.createElement("input");
+        r.type = "radio"; r.name = "categoria"; r.value = c;
+        r.id = "cat-" + i; r.className = "chip-input";
+        var l = document.createElement("label");
+        l.htmlFor = r.id; l.className = "chip"; l.textContent = c;
+        grupo.append(r, l);
       });
 
       $("form-entrada").addEventListener("submit", protegido(entrar, "msg-entrada"));

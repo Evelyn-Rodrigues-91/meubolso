@@ -144,6 +144,27 @@ button.pequeno { padding: 6px 14px; min-height: 44px; }
 #form-gasto > button, #btn-foto { width: 100%; }
 #btn-foto { margin-top: 10px; }
 
+.categorias { border: 0; padding: 0; margin: 0 0 10px; min-width: 0; }
+.categorias legend { padding: 0; margin-bottom: 6px; font-size: 0.9rem; color: var(--suave); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip-input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+label.chip {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  margin: 0;
+  padding: 10px 14px;
+  min-height: 44px;
+  font-size: 0.9rem;
+  color: var(--texto);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.chip-input:checked + label.chip { color: #fff; background: var(--degrade); border-color: transparent; }
+.chip-input:focus-visible + label.chip { outline: 2px solid var(--roxo); outline-offset: 1px; }
+
 .linha { display: flex; gap: 10px; align-items: flex-end; }
 .linha > button { flex: 1; }
 
