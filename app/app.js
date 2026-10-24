@@ -28,14 +28,27 @@
     return "Algo deu errado. Tente de novo em instantes.";
   }
 
+  // Se uma ação falhar sem aviso, a pessoa vê uma frase em vez de a tela ficar parada.
+  function protegido(fn, idMsg) {
+    return async function () {
+      try {
+        return await fn.apply(this, arguments);
+      } catch (e) {
+        mostrar($(idMsg), "Sem conexão ou falha inesperada. Verifique a internet e tente de novo.", "erro");
+      }
+    };
+  }
+
   // ---------- Entrada ----------
   function telaEntrada() {
     usuario = null;
+    $("carregando").hidden = true;
     $("tela-app").hidden = true;
     $("tela-entrada").hidden = false;
   }
 
   function telaApp() {
+    $("carregando").hidden = true;
     $("tela-entrada").hidden = true;
     $("tela-app").hidden = false;
     $("data").value = dataLocal(new Date());
@@ -88,7 +101,7 @@
   }
 
   // ---------- Dados ----------
-  async function carregar() {
+  async function carregarGastos() {
     var hoje = new Date();
     var inicio = dataLocal(new Date(hoje.getFullYear(), hoje.getMonth(), 1));
     var fim = dataLocal(new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1));
@@ -104,6 +117,7 @@
     }
     carregarResumo();
   }
+  var carregar = protegido(carregarGastos, "msg-lista");
 
   function desenhar(gastos, hoje) {
     var mes = 0, dia = 0, porCat = {};
@@ -163,7 +177,7 @@
       b.type = "button";
       b.textContent = "Apagar";
       b.setAttribute("aria-label", "Apagar gasto " + (g.descricao || g.categoria));
-      b.addEventListener("click", function () { apagar(g); });
+      b.addEventListener("click", function () { protegido(apagar, "msg-lista")(g); });
       li.append(info, val, b);
       lista.append(li);
     });
@@ -217,13 +231,18 @@
       var url = URL.createObjectURL(arquivo);
       var img = new Image();
       img.onload = function () {
-        var escala = Math.min(1, 1600 / Math.max(img.width, img.height));
-        var c = document.createElement("canvas");
-        c.width = Math.round(img.width * escala);
-        c.height = Math.round(img.height * escala);
-        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-        URL.revokeObjectURL(url);
-        resolve(c.toDataURL("image/jpeg", 0.85).split(",")[1]);
+        try {
+          var escala = Math.min(1, 1600 / Math.max(img.width, img.height));
+          var c = document.createElement("canvas");
+          c.width = Math.round(img.width * escala);
+          c.height = Math.round(img.height * escala);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          resolve(c.toDataURL("image/jpeg", 0.85).split(",")[1]);
+        } catch (e) {
+          reject(new Error("foto"));
+        } finally {
+          URL.revokeObjectURL(url);
+        }
       };
       img.onerror = function () {
         URL.revokeObjectURL(url);
@@ -297,35 +316,40 @@
 
   // ---------- Início ----------
   async function iniciar() {
-    var sel = $("categoria");
-    cfg.CATEGORIAS.forEach(function (c) {
-      var o = document.createElement("option");
-      o.value = c; o.textContent = c;
-      sel.append(o);
-    });
+    try {
+      var sel = $("categoria");
+      cfg.CATEGORIAS.forEach(function (c) {
+        var o = document.createElement("option");
+        o.value = c; o.textContent = c;
+        sel.append(o);
+      });
 
-    $("form-entrada").addEventListener("submit", entrar);
-    $("btn-criar").addEventListener("click", criarConta);
-    $("btn-sair").addEventListener("click", sair);
-    $("form-gasto").addEventListener("submit", lancar);
-    var arquivoFoto = document.createElement("input");
-    arquivoFoto.type = "file";
-    arquivoFoto.accept = "image/*";
-    arquivoFoto.addEventListener("change", enviarFoto);
-    $("btn-enviar").addEventListener("click", enviarTexto);
-    $("btn-foto").addEventListener("click", function () { arquivoFoto.click(); });
+      $("form-entrada").addEventListener("submit", protegido(entrar, "msg-entrada"));
+      $("btn-criar").addEventListener("click", protegido(criarConta, "msg-entrada"));
+      $("btn-sair").addEventListener("click", protegido(sair, "msg-lista"));
+      $("form-gasto").addEventListener("submit", protegido(lancar, "msg-gasto"));
+      var arquivoFoto = document.createElement("input");
+      arquivoFoto.type = "file";
+      arquivoFoto.accept = "image/*";
+      arquivoFoto.addEventListener("change", protegido(enviarFoto, "msg-assistente"));
+      $("btn-enviar").addEventListener("click", enviarTexto);
+      $("btn-foto").addEventListener("click", function () { arquivoFoto.click(); });
 
-    if (!window.supabase) {
-      $("tela-entrada").hidden = false;
-      return mostrar($("msg-entrada"), "Não deu para carregar o app. Verifique a internet e recarregue a página.", "erro");
-    }
-    banco = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_CHAVE_PUBLICA);
-    var s = await banco.auth.getSession();
-    if (s.data && s.data.session) {
-      usuario = s.data.session.user;
-      telaApp();
-    } else {
+      if (!window.supabase) {
+        telaEntrada();
+        return mostrar($("msg-entrada"), "Não deu para carregar o app. Verifique a internet e recarregue a página.", "erro");
+      }
+      banco = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_CHAVE_PUBLICA);
+      var s = await banco.auth.getSession();
+      if (s.data && s.data.session) {
+        usuario = s.data.session.user;
+        telaApp();
+      } else {
+        telaEntrada();
+      }
+    } catch (e) {
       telaEntrada();
+      mostrar($("msg-entrada"), "Não deu para iniciar o app. Verifique a internet e recarregue a página.", "erro");
     }
   }
 

@@ -96,8 +96,8 @@ h2 { margin: 0 0 12px; font-size: 1.05rem; }
   color: #fff;
 }
 .numero-bloco { flex: 1; display: flex; flex-direction: column; }
-.destaque .rotulo { color: rgba(255, 255, 255, 0.82); }
-.rotulo { font-size: 0.85rem; color: var(--suave); }
+.destaque .rotulo { color: #fff; }
+.rotulo { font-size: 0.9rem; color: var(--suave); }
 .numero-bloco strong { font-size: 1.5rem; color: #fff; }
 
 label { display: block; font-size: 0.9rem; color: var(--suave); margin-bottom: 10px; flex: 1; }
@@ -140,7 +140,7 @@ button.secundario {
   box-shadow: none;
 }
 button.secundario:hover { background: var(--claro); filter: none; }
-button.pequeno { padding: 6px 14px; min-height: 36px; }
+button.pequeno { padding: 6px 14px; min-height: 44px; }
 #form-gasto > button, #btn-foto { width: 100%; }
 #btn-foto { margin-top: 10px; }
 
@@ -167,12 +167,13 @@ button.pequeno { padding: 6px 14px; min-height: 36px; }
 .lista li:last-child { border-bottom: 0; }
 .gasto-info { flex: 1; min-width: 0; }
 .gasto-desc { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gasto-meta { font-size: 0.8rem; color: var(--suave); }
+.gasto-meta { font-size: 0.9rem; color: var(--suave); }
 .gasto-valor { font-weight: 600; }
 .lista button {
-  padding: 4px 10px;
-  min-height: 36px;
-  font-size: 0.85rem;
+  padding: 4px 12px;
+  min-height: 44px;
+  min-width: 44px;
+  font-size: 0.9rem;
   background: transparent;
   color: var(--erro);
   border: 1px solid var(--borda);
